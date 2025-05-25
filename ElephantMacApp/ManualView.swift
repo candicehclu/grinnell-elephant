@@ -107,7 +107,7 @@ struct ManualTemplateView<Content: View>:  View {
                     Color.clear
                         .accessibilityElement(children: .combine)
                         .accessibilityIdentifier(currentPageIdentifier)
-                        .shadow(color: themeManager.curTheme.shadow_1.opacity(0.2), radius: 8, x: 0, y: 4)
+                        .shadow(color: themeManager.curTheme.text_1.opacity(0.2), radius: 8, x: 0, y: 4)
                 )
                 .id(currentPageIdentifier)
             }//ScrollView
@@ -146,8 +146,8 @@ struct ManualTemplateView<Content: View>:  View {
             .padding(.bottom, 20)
         }
         .preferredColorScheme(themeManager.Mode ? .dark : .light)
-        .frame(width: 500, height: 500)
-        .background(themeManager.curTheme.background)
+        .frame(width: 400, height: 500)
+        .background(themeManager.curTheme.background_1)
     }//VStack
     
 }// var body
@@ -164,6 +164,7 @@ struct ManualTemplateView<Content: View>:  View {
 // ====================================================
 
 struct ManualView:View{
+    @EnvironmentObject var themeManager: ThemeManager
     var body: some View {
         ManualTemplateView(
             currentPageIdentifier: "manualFirstPage",
@@ -183,7 +184,7 @@ struct ManualView:View{
                             .font(.system(.title2, design: .rounded).weight(.semibold))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding()
-                            .background(DefaultColors.main_color_1)
+                            .background(themeManager.curTheme.main_color_1)
                             .cornerRadius(10)
                     }// NavigationLink stopwatch
                     .buttonStyle(PlainButtonStyle())
@@ -193,7 +194,7 @@ struct ManualView:View{
                             .font(.system(.title2, design: .rounded).weight(.semibold))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding()
-                            .background(DefaultColors.main_color_1)
+                            .background(themeManager.curTheme.main_color_1)
                             .cornerRadius(10)
                         
                     }//NavigationLink pomodoro
@@ -204,7 +205,7 @@ struct ManualView:View{
                             .font(.system(.title2, design: .rounded).weight(.semibold))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding()
-                            .background(DefaultColors.main_color_1)
+                            .background(themeManager.curTheme.main_color_1)
                             .cornerRadius(10)
                         
                     }//NavigationLink tokenspageview
@@ -215,7 +216,7 @@ struct ManualView:View{
                             .font(.system(.title2, design: .rounded).weight(.semibold))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding()
-                            .background(DefaultColors.main_color_1)
+                            .background(themeManager.curTheme.main_color_1)
                             .cornerRadius(10)
                         
                     }//NavigationLink examplespage
@@ -226,7 +227,7 @@ struct ManualView:View{
                             .font(.system(.title2, design: .rounded).weight(.semibold))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding()
-                            .background(DefaultColors.main_color_1)
+                            .background(themeManager.curTheme.main_color_1)
                             .cornerRadius(10)
                         
                     }//NavigationLink widgetsetup
@@ -378,7 +379,7 @@ struct CheckBoxView: View {
     // Action after the checkmark
     var body: some View {
         Image(systemName: isChecked ? "checkmark.square.fill" : "square")
-            .foregroundColor(isChecked ? DefaultColors.main_color_3 : Color.secondary)
+            .foregroundColor(isChecked ? themeManager.curTheme.main_color_3 : Color.secondary)
             .onTapGesture {
                 if(isChecked == false){ //once checked only checking possible unchecking impossible
                     isChecked=true
@@ -531,6 +532,10 @@ struct WidgetSetupPageView: View {
 }//WidgetSetupPageView
 
 #Preview {
+    let themeManager = ThemeManager()
     ManualView()
+        .environmentObject(themeManager)
+        .environmentObject(TaskListStorage())
+        .environmentObject(TokenLogic())
 }
 

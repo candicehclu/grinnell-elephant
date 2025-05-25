@@ -71,7 +71,7 @@ let magic = [
     ShopItem(id: "magic-witch", name: "Witch", price: 5),
     ShopItem(id: "magic-fairy", name: "Fairy", price: 5),
     ShopItem(id: "magic-vampire", name: "Vampire", price: 5),
-    ShopItem(id: "magic-superman", name: "magic-superman", price: 5),
+    ShopItem(id: "magic-superman", name: "Superman", price: 5),
 ]
 
 let packs = [mammals, marines, birds, monsters, unicorns, magic]

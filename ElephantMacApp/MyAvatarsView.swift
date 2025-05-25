@@ -36,8 +36,8 @@ struct MyAvatarView: View {
                 }
                 .padding()
             }
-            .frame(width: 500, height: 500)
-            .background(themeManager.curTheme.background)
+            .frame(width: 400, height: 500)
+            .background(themeManager.curTheme.background_1)
             .preferredColorScheme(themeManager.Mode ? .dark : .light)
             
             if(showConfirmation) {
@@ -57,7 +57,8 @@ struct MyAvatarView: View {
         }
         .accessibilityIdentifier("myAvatarsPage")
         .preferredColorScheme(themeManager.Mode ? .dark : .light)
-        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.background))
+//        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.background_1))
+        .foregroundColor(themeManager.curTheme.text_1)
     }
     
 }
@@ -75,7 +76,7 @@ struct DisplayItemBlock : View {
                     Image("\(item.id)")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 170, height: 170)
+                        .frame(width: 140, height: 140)
             }
             .accessibilityIdentifier("myAvatarButton_\(item.id)")
             .cornerRadius(10)
@@ -115,4 +116,6 @@ struct DisplayAllItems: View {
     let themeManager = ThemeManager()
     MyAvatarView()
         .environmentObject(themeManager)
+        .environmentObject(TaskListStorage())
+        .environmentObject(TokenLogic())
 }

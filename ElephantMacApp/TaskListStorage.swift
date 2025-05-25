@@ -19,6 +19,12 @@ class TaskListStorage: ObservableObject{
     private let tasksFilename = "TaskLists.json"
     private let checklistsFilename = "Checklists.json"
     
+    @AppStorage("lastTasklistUpdate") var lastTasklistUpdate: Double = 0.0
+    
+    @Published var curChecklistId: UUID? = nil
+    var curChecklist: Checklist? {
+        checklists.first(where: { $0.id == curChecklistId })
+    }
     @Published var taskList = TaskList(tasks: []){ //saves current task list
         didSet{
             saveTasks()//updates tasks
@@ -32,13 +38,36 @@ class TaskListStorage: ObservableObject{
         }
     }
     
+    func updateTaskList() {
+        let today = Date.now
+        let lastUpdateDate = NSDate(timeIntervalSince1970: lastTasklistUpdate)
+        // if not same day, delete all tasks that are completed
+        if !Calendar.current.isDate(today, inSameDayAs: lastUpdateDate as Date) {
+            lastTasklistUpdate = today.timeIntervalSince1970
+            for checklist in checklists {
+                for task in checklist.tasks {
+                    if task.isCompleted {
+                        removeTask(from: checklist.id, task: task)
+                    }
+                }
+            }
+        }
+    }
+    
     init(){
         loadTasks() //loads tasks for user view
         loadChecklists() //loads all currently existing checklists
         
-        // created default checklist if none currently exists
+        // created default grinnell wellness checklist if none currently exists
         if checklists.isEmpty {
-            checklists.append(Checklist(name: "Checklist #1", tasks: []))
+            let firstChecklist = Checklist(name: "Fun activities at Grinnell!", tasks: [])
+            checklists.append(firstChecklist)
+            curChecklistId = firstChecklist.id
+            addTask(to: curChecklistId!, title: "Get a drink and snacks at DSA suite (JRC 3rd)")
+            addTask(to: curChecklistId!, title: "Get coffee at Saints rest")
+            addTask(to: curChecklistId!, title: "Get ice cream at Dari Barn")
+            addTask(to: curChecklistId!, title: "Chill at the hammocks")
+            addTask(to: curChecklistId!, title: "Play a game (pool/foosball/ping pong) at game room")
             saveChecklists()
         }
     }

@@ -20,6 +20,9 @@ import SwiftUI
 struct ContentView: View {
     @State private var isPressed = false
     @EnvironmentObject var themeManager: ThemeManager // theme manager
+    @EnvironmentObject var storage: TaskListStorage // tasklist storage
+    @EnvironmentObject var tokenLogic: TokenLogic //to modify tokens
+    @AppStorage("curAvatar") private var curAvatar = "mammal-elephant"
     @AppStorage("timerMode") var timerMode: String = "stopwatch"
 
     var body: some View {
@@ -52,7 +55,7 @@ struct ContentView: View {
                     Text("♡🐘♡")
                         .font(.system(.headline, design: .rounded).weight(.semibold))
                     // App logo placeholder
-                    Image("realistic_elephant")
+                    Image(curAvatar)
                         .resizable()
                         .scaledToFit()
                     // Title area and button separator
@@ -77,7 +80,8 @@ struct ContentView: View {
                         .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .background(themeManager.curTheme.background)
+                    .background(themeManager.curTheme.background_1)
+                    .foregroundColor(themeManager.curTheme.text_2)
                     .accessibilityIdentifier("timerPage")
                     .frame(alignment: .center)
                                                             
@@ -93,7 +97,8 @@ struct ContentView: View {
                     }  // NavigationLink - set up and adjustments
                     .buttonStyle(PlainButtonStyle())
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .background(themeManager.curTheme.background)
+                    .background(themeManager.curTheme.background_1)
+                    .foregroundColor(themeManager.curTheme.text_2)
                     .accessibilityIdentifier("shopPage")
                     
                     // CHECKLISTS SHOP BUTTON
@@ -108,21 +113,32 @@ struct ContentView: View {
                     }  // NavigationLink - set up and adjustments
                     .buttonStyle(PlainButtonStyle())
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .background(themeManager.curTheme.background)
+                    .background(themeManager.curTheme.background_1)
+                    .foregroundColor(themeManager.curTheme.text_2)
                     .padding(.bottom, 25)
                     .accessibilityIdentifier("checklistsPageLink")
                     
                 } // VStack - structures whole page
-                .background(themeManager.curTheme.background)
+                .background(themeManager.curTheme.background_1)
             } // ZStack
         } // NavigationStack
         .environmentObject(themeManager) // set this on NavStack to stay clean
-        .frame(width: 500, height: 500)
-        .preferredColorScheme(themeManager.Mode ? .dark : .light)
-        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.background))
+        .frame(width: 400, height: 500)
+        // .preferredColorScheme(themeManager.Mode ? .dark : .light)
+//        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.background))
+        .foregroundColor(themeManager.curTheme.text_1)
+        .onAppear {
+            NotificationView.shared.requestNotificationPermission()
+            tokenLogic.updateDailyLimit()
+            storage.updateTaskList()
+        }
     } // main body
 } // ContentView Struct
 
 #Preview {
+    let themeManager = ThemeManager()
     ContentView()
+        .environmentObject(themeManager)
+        .environmentObject(TaskListStorage())
+        .environmentObject(TokenLogic())
 }

@@ -43,24 +43,24 @@ struct ElephantConfirmationDialogue: View {
             HStack{
                 ElephantButton(
                     buttonText: "Cancel",
-                    action: onConfirm,
-                    color: themeManager.curTheme.background
+                    action: onCancel,
+                    color: themeManager.curTheme.main_color_1
                 )
                 ElephantButton(
                     buttonText: "Confirm",
                     action: onConfirm,
-                    color: themeManager.curTheme.background
+                    color: themeManager.curTheme.main_color_2
                 )
             }
         }
         .padding()
         .frame(width: 350, height: 200, alignment: .center)
         .cornerRadius(20)
-        .background(themeManager.curTheme.background)
+        .background(themeManager.curTheme.background_2)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .overlay(
             RoundedRectangle(cornerRadius: 20)
-                .stroke(themeManager.curTheme.shadow_2, lineWidth: 5)
+                .stroke(themeManager.curTheme.text_2, lineWidth: 5)
         )
         .shadow(color: .black.opacity(0.3), radius: 20)
     }
@@ -89,18 +89,18 @@ struct ElephantPopup: View {
                 ElephantButton(
                     buttonText: "Confirm",
                     action: onConfirm,
-                    color: themeManager.curTheme.background
+                    color: themeManager.curTheme.main_color_2
                 )
             }
         }
         .padding()
         .frame(width: 350, height: 200, alignment: .center)
         .cornerRadius(20)
-        .background(themeManager.curTheme.background)
+        .background(themeManager.curTheme.background_2)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .overlay(
             RoundedRectangle(cornerRadius: 20)
-                .stroke(themeManager.curTheme.shadow_2, lineWidth: 5)
+                .stroke(themeManager.curTheme.text_2, lineWidth: 5)
         )
         .shadow(color: .black.opacity(0.3), radius: 20)
     }
@@ -141,20 +141,21 @@ struct ElephantButton: View {
         Button (action: action) {
             Text("\(buttonText)")
                 .fontWeight(.bold)
-                .font(.system(size: 16, weight: .bold, design: .rounded))
-                .padding()
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .padding(13)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(color ?? themeManager.curTheme.main_color_2, lineWidth: 2)
                 )
                 .background(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke(textColor ?? themeManager.curTheme.shadow_1, lineWidth: 2)
+                        .stroke(textColor ?? themeManager.curTheme.text_2, lineWidth: 2)
                 )
         }
-        .background(themeManager.curTheme.main_color_2)
+        .background(color ?? themeManager.curTheme.main_color_2)
         .cornerRadius(20)
-        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_2))
+//        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_2))
+         .foregroundColor(themeManager.curTheme.text_2)
         .buttonBorderShape(.capsule)
         .buttonStyle(PlainButtonStyle())
     }
@@ -210,6 +211,7 @@ struct ToSettingsPageButton: View {
                 .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
         }
         .buttonStyle(PlainButtonStyle())
+        .foregroundColor(themeManager.curTheme.text_2)
         .accessibilityIdentifier("settingsPageButton")
     }
 }
@@ -232,6 +234,7 @@ struct ToManualPageButton: View {
                 .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
         }
         .buttonStyle(PlainButtonStyle())
+        .foregroundColor(themeManager.curTheme.text_2)
         .accessibilityIdentifier("manualPageButton")
     }
 }
@@ -254,6 +257,7 @@ struct ToHomePageButton: View {
                 .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
         }
         .buttonStyle(PlainButtonStyle())
+        .foregroundColor(themeManager.curTheme.text_2)
         .accessibilityIdentifier("homeButton")
     }
 }
@@ -273,15 +277,17 @@ struct ToMyAvatarsButton: View {
                 .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
         }
         .buttonStyle(PlainButtonStyle())
+        .foregroundColor(themeManager.curTheme.text_2)
         .accessibilityIdentifier("toMyAvatarsButton")
     }
 }
 
 struct TokenDisplay: View {
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var tokenLogic: TokenLogic
     
     var body: some View {
-        let tokenNum: Int = UserDefaults.standard.integer(forKey: "tokenNum")
+        let tokenNum = tokenLogic.tokenNum
         Image(systemName: "dollarsign.circle.fill")
             .font(.title2)
             .frame(width: 40, height: 40)

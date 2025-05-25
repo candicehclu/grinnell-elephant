@@ -8,7 +8,8 @@
 
 import SwiftUI
 
-class SettingsModel: ObservableObject{
-    @Published var mode: Bool = false
-    @Published var selectedThemeColor: Color = DefaultColors.background
-}
+//class SettingsModel: ObservableObject{
+//    @EnvironmentObject var themeManager: ThemeManager
+//    @Published var mode: Bool = false
+//    @Published var selectedThemeColor: Color = themeManager.curTheme.background_1
+//}

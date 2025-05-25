@@ -15,6 +15,7 @@ struct ShopMainPageView: View {
     
     @AppStorage("curPalette") var curPalette: String = "defaultElephant"
     @EnvironmentObject private var themeManager: ThemeManager
+    @EnvironmentObject var tokenLogic: TokenLogic
     
     // only initialize it once
     init() {
@@ -32,6 +33,7 @@ struct ShopMainPageView: View {
                             Text("Shop")
                                 .font(.system(size: 28, weight: .bold, design: .rounded))
                                 .padding()
+                                .padding(.leading, 5)
                                 .frame(alignment: .center)
                             Spacer()
                             TokenDisplay()
@@ -57,7 +59,7 @@ struct ShopMainPageView: View {
         }
         .preferredColorScheme(themeManager.Mode ? .dark : .light)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(themeManager.curTheme.background)
+        .background(themeManager.curTheme.background_1)
         .accessibilityIdentifier("shopMainPageView")
     }
 }
@@ -69,6 +71,8 @@ struct ShopMainPageView: View {
     // themeManager.setTheme(named: "defaultElephant")
     return ShopMainPageView()
         .environmentObject(themeManager)
+        .environmentObject(TaskListStorage())
+        .environmentObject(TokenLogic())
 }
 
 struct ShopItemBlock : View {
@@ -95,6 +99,7 @@ struct PackBlock : View {
         Text("\(packName) Pack")
             // .font(.headline)
             .padding(.leading, 20)
+            .padding(.bottom, -8)
             .font(.system(size: 18, weight: .bold, design: .rounded))
             .frame(maxWidth: .infinity, alignment: .leading)
         
@@ -102,13 +107,14 @@ struct PackBlock : View {
             ZStack{
                 RoundedRectangle(cornerRadius: 20)
                     .foregroundStyle(themeManager.curTheme.main_color_1)
-                    .frame(width: CGFloat(pack.count)*130, height: 140)
+                    .frame(width: CGFloat(pack.count)*130, height: 130)
                     
                 HStack{
                     ForEach(pack) { item in
                         ShopItemBlock(item:item)
                     }
                 }
+                .padding(.leading, -5)
             }
         }
         .padding(.leading, 20)

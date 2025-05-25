@@ -35,7 +35,8 @@ struct ChecklistMainPageView: View {
                     Text("Checklists")
                         .kerning(2)
                         .font(.system(.largeTitle, design: .rounded).weight(.bold))
-                        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.background))
+//                        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.background_1))
+                        .foregroundColor(themeManager.curTheme.text_1)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.leading, 15)
                     
@@ -80,7 +81,7 @@ struct ChecklistMainPageView: View {
                 .environmentObject(themeManager)
                 .environmentObject(tokenLogic)
             }
-            .frame(width: 500, height: 500)
+            .frame(width: 400, height: 500)
         }//prompt for user entering new checklist name
         .alert("Create New Checklist", isPresented: $showingNewList) {
             TextField("Checklist Name", text: $newListName)
@@ -136,8 +137,8 @@ struct ChecklistMainPageView: View {
         }
         .padding()
         .preferredColorScheme(themeManager.Mode ? .dark : .light)
-        .background(themeManager.curTheme.background)
-        .frame(width: 500, height: 500)
+        .background(themeManager.curTheme.background_1)
+        .frame(width: 400, height: 500)
         .accessibilityIdentifier("checklistsMainPage")
     }
     //initial view of new checklist buttons
@@ -146,13 +147,15 @@ struct ChecklistMainPageView: View {
                 HStack {
                     Text(checklist.name) //displays checklist name
                         .font(.system(.title3, design: .rounded).weight(.medium))
-                        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_1))
+                        // .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_1))
+                        .foregroundColor(themeManager.curTheme.text_1)
                     
                     Spacer()
                     
                     Text("\(checklist.tasks.filter { $0.isCompleted }.count)/\(checklist.tasks.count)") //displays number of completed tasks/total tasks
                         .font(.system(.subheadline, design: .rounded))
-                        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_1).opacity(0.7))
+                        // .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_1).opacity(0.7))
+                        .foregroundColor(themeManager.curTheme.text_1.opacity(0.7))
                 }
                 .padding()
                 .background(
@@ -192,6 +195,7 @@ struct CheckListView: View {
     @EnvironmentObject var themeManager: ThemeManager //for theme and modal changes
     
     let checklistId: UUID //initializes checklist id
+    let onCancel: () -> Void // added to support inline checklist view
     @State private var checklistName: String //checklist name string
     @State private var isEditing: Bool = false //boolean that checks if we're editing the checklist
     @State private var changedName: String = "" //changed checklist name
@@ -202,10 +206,11 @@ struct CheckListView: View {
     @State private var hasChanged: Bool = false //boolean to determine if the checklist has been changed (add/delete tasks)
     
     // Pass initial tasks through init to avoid fetching during view creation
-    init(checklistId: UUID, checklistName: String, initialTasks: [TaskItem]) {
+    init(checklistId: UUID, checklistName: String, initialTasks: [TaskItem], onCancel: @escaping () -> Void = {}) {
         self.checklistId = checklistId
         self._checklistName = State(initialValue: checklistName)
         self._localTasks = State(initialValue: initialTasks)
+        self.onCancel = onCancel
     }
     
     var body: some View {
@@ -216,7 +221,8 @@ struct CheckListView: View {
                     TextField("Checklist Name", text: $changedName)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .font(.title2)
-                        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_2))
+//                        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_2))
+                        .foregroundColor(themeManager.curTheme.text_1)
                         .fontWeight(.bold)
                         .fontDesign(.rounded)
                         .padding(.horizontal)
@@ -231,7 +237,8 @@ struct CheckListView: View {
                     Text(checklistName)
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_2))
+//                        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_2))
+                        .foregroundColor(themeManager.curTheme.text_2)
                         .fontDesign(.rounded)
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -255,7 +262,7 @@ struct CheckListView: View {
                 Text("No tasks yet!")
                     .foregroundColor(themeManager.curTheme.main_color_2)
                     .padding(10)
-                    .listRowBackground(themeManager.curTheme.background)
+                    .listRowBackground(themeManager.curTheme.background_1)
             } else { //displays added task list items
                 ForEach(localTasks) { task in
                     taskRow(for: task) //line for each task item in checklist
@@ -276,7 +283,8 @@ struct CheckListView: View {
                         addNewTask()
                     }
                     .textFieldStyle(PlainTextFieldStyle())
-                    .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_1))
+//                    .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_1))
+                    .foregroundColor(themeManager.curTheme.main_color_1)
             }
         }
         .listStyle(PlainListStyle())
@@ -286,13 +294,18 @@ struct CheckListView: View {
     private func taskRow(for task: TaskItem) -> some View {
         HStack { //display for completed or newly created task list
             Image(systemName: task.isCompleted ? "checkmark.square.fill" : "square")
-                .foregroundColor(task.isCompleted ? themeManager.curTheme.main_color_2 : themeManager.curTheme.main_color_3)
+//                .foregroundColor(task.isCompleted ? themeManager.curTheme.main_color_2 : themeManager.curTheme.main_color_3)
+                .foregroundColor(themeManager.curTheme.main_color_2)
                 .onTapGesture { //sets task as completed on user selection
                     if let index = localTasks.firstIndex(where: { $0.id == task.id }) {
                         localTasks[index].isCompleted.toggle()
                         storage.removeTask(task: task)
                         if localTasks[index].isCompleted{ //only adds token if completed a task 
                             tokenLogic.addToken() //adds token when a task item is marked as completed
+                        }
+                        // if unchecked, subtract token
+                        if !localTasks[index].isCompleted {
+                            tokenLogic.subtractToken()
                         }
                         hasChanged = true
                     }
@@ -362,5 +375,13 @@ struct CheckListView: View {
         }
         isEditing = false //sets editing back to false after changes have been made
     }
+}
+
+#Preview {
+    let themeManager = ThemeManager()
+    ChecklistMainPageView()
+        .environmentObject(themeManager)
+        .environmentObject(TaskListStorage())
+        .environmentObject(TokenLogic())
 }
 

@@ -30,7 +30,7 @@ a new notification with times)
 
 
 import UserNotifications
-
+import SwiftUI
 
 //single ton class (Only one instance)
 class NotificationView{
@@ -87,12 +87,34 @@ class NotificationView{
          * NotificationView.shared.scheduleNotification( notifyTime: 30, title: "Break Time", body: "Take a break")
          */
         func scheduleNotification(notifyTime seconds: TimeInterval, title: String, body: String){
+            
+            @AppStorage("curAvatar") var curAvatar = "mammal-elephant"
 
             // get the content
             let content   = UNMutableNotificationContent()
             content.title = title
             content.body  = body
             content.sound = UNNotificationSound.default
+            
+            // attach curavatar to the notification
+            if let image = NSImage(named: curAvatar),
+                   let tiffData = image.tiffRepresentation,
+                   let bitmap = NSBitmapImageRep(data: tiffData),
+                   let pngData = bitmap.representation(using: .png, properties: [:]) {
+
+                    // Create a temporary file URL
+                    let tempDir = FileManager.default.temporaryDirectory
+                    let tempURL = tempDir.appendingPathComponent("notification_icon.png")
+
+                    do {
+                        try pngData.write(to: tempURL)
+                        let attachment = try UNNotificationAttachment(identifier: "assetImage", url: tempURL, options: nil)
+                        content.attachments = [attachment]
+                    } catch {
+                        print("Failed to write asset image to disk: \(error)")
+                    }
+                }
+
             
             // triger (when to show)
             let notificationTrigger = UNTimeIntervalNotificationTrigger(timeInterval: seconds, repeats: false)
@@ -108,3 +130,42 @@ class NotificationView{
         
     } //end of class
 
+var NotificationMusicDict = [
+    "Arabian Nightfall": "arabian_nightfall.mp3",
+    "Baroque Coffee House": "baroque_coffee_house.mp3",
+    "Cartoon Bank Heist": "cartoon_bank_heist.mp3",
+    "Rooster": "rooster.wav",
+    "Sour Tennessee Red": "sour_tennessee_red.mp3",
+    "None": ""
+]
+
+var WorkNotifications = [
+    "Time to get back to work and be productive!",
+    "Refreshed? Let’s make progress now!",
+    "One step closer to your goal. Let’s go!",
+    "Back to it — you've got this!",
+    "You're making great progress! Keep it up!",
+    "Let’s crush the next task!",
+    "Your wellness buddy says: time to focus!",
+    "Welcome back! Let’s do a little more.",
+    "Your mind is rested. Let’s use that energy!",
+    "Ready for your next level? Let’s go!",
+    "Break’s done — time to power up!",
+    "Let’s earn another token!",
+    "Focus mode: ON. Let's win today!"
+]
+
+var BreakNotifications = [
+    "Take a break and pick a wellness task!",
+    "Take a breath, take a stretch.",
+    "Step away and rest your mind for a few minutes.",
+    "Great work! Take a well-deserved break.",
+    "Break time! You've earned this one.",
+    "Victory! Time to reward yourself with rest.",
+    "Your wellness buddy says: unplug for a bit!",
+    "Hydration check: drink some water while you break!",
+    "The elephant says: nap, stretch, or dance!",
+    "Break now, conquer later.",
+    "Let your eyes rest. You've been working hard.",
+    "Short break, big impact.",
+]
