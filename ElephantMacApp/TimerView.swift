@@ -55,74 +55,58 @@ struct TimerView: View {
             
             ScrollView{
                 VStack(spacing: 15){
-                    if storage.checklists.isEmpty  {
-                        Text("No checklists available..")
-//                            .foregroundColor(themeManager.Mode ? themeManager.textColor(for: themeManager.curTheme.background).opacity(0.7) : themeManager.textColor(for: themeManager.curTheme.main_color_1).opacity(0.7))
-                            .foregroundColor(themeManager.curTheme.text_1)
-                            .padding()
-                    } else {
-                        if let checklist = storage.curChecklist {                            
-                            VStack(alignment: .leading, spacing: 10) {
-                                ForEach(checklist.tasks.indices, id: \.self) { index in
-                                    let task = checklist.tasks[index]
-                                    
-                                    HStack {
-                                        Image(systemName: task.isCompleted
-                                              ? "checkmark.square.fill"
-                                              : "square")
-                                        .foregroundColor(themeManager.curTheme.main_color_2)
-                                        .onTapGesture {
-                                            // Make a mutable copy of tasks
-                                            var updatedTasks = checklist.tasks
-                                            // Flip the isCompleted boolean
-                                            updatedTasks[index].isCompleted.toggle()
-                                            // Persist the change back into storage
-                                            storage.updateTasks(for: checklist.id,
-                                                                tasks: updatedTasks)
-                                            // If now completed, give the user a token
-                                            if updatedTasks[index].isCompleted {
-                                                tokenLogic.addToken()
-                                            }
-                                            // subtract token if user unchecked
-                                            if !updatedTasks[index].isCompleted {
-                                                tokenLogic.subtractToken()
-                                            }
-                                        }
-//                                        Text(task.title)
-//                                            .strikethrough(task.isCompleted)
-//                                            .foregroundColor(
-//                                                task.isCompleted
-//                                                ? themeManager.curTheme.main_color_2
-//                                                : themeManager.curTheme.main_color_2
-//                                            )
-                                        EditableTextView(
-                                            task: Binding(
-                                                get: { checklist.tasks[index] },
-                                                set: {
-                                                    var updatedTasks = checklist.tasks
-                                                    updatedTasks[index] = $0
-                                                    storage.updateTasks(for: checklist.id, tasks: updatedTasks)
-                                                }
-                                            )
-                                        )
-                                    }
-                                }
-                                //additional new task row
+                    if let checklist = storage.curChecklist {
+                        VStack(alignment: .leading, spacing: 10) {
+                            ForEach(checklist.tasks.indices, id: \.self) { index in
+                                let task = checklist.tasks[index]
                                 HStack {
-                                    Image(systemName: "plus")
-                                        .foregroundColor(themeManager.curTheme.main_color_1)
-                                    TextField("Add new task...", text: $newTask)//, onCommit: addNewTask)// <- new task creation on '+'
-                                    //creates new task on enter
-                                        .onSubmit {
-                                            addNewTask()
+                                    Image(systemName: task.isCompleted
+                                          ? "checkmark.square.fill"
+                                          : "square")
+                                    .foregroundColor(themeManager.curTheme.main_color_2)
+                                    .onTapGesture {
+                                        // Make a mutable copy of tasks
+                                        var updatedTasks = checklist.tasks
+                                        // Flip the isCompleted boolean
+                                        updatedTasks[index].isCompleted.toggle()
+                                        // Persist the change back into storage
+                                        storage.updateTasks(for: checklist.id,
+                                                            tasks: updatedTasks)
+                                        // If now completed, give the user a token
+                                        if updatedTasks[index].isCompleted {
+                                            tokenLogic.addToken()
                                         }
-                                        .textFieldStyle(PlainTextFieldStyle())
-//                                        .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_1))
-                                        .foregroundColor(themeManager.curTheme.main_color_1)
+                                        // subtract token if user unchecked
+                                        if !updatedTasks[index].isCompleted {
+                                            tokenLogic.subtractToken()
+                                        }
+                                    }
+                                    EditableTextView(
+                                        task: Binding(
+                                            get: { checklist.tasks[index] },
+                                            set: {
+                                                var updatedTasks = checklist.tasks
+                                                updatedTasks[index] = $0
+                                                storage.updateTasks(for: checklist.id, tasks: updatedTasks)
+                                            }
+                                        )
+                                    )
                                 }
                             }
-                            .padding(.horizontal, 40)
+                            //additional new task row
+                            HStack {
+                                Image(systemName: "plus")
+                                    .foregroundColor(themeManager.curTheme.main_color_1)
+                                TextField("Add new task...", text: $newTask)//, onCommit: addNewTask)// <- new task creation on '+'
+                                //creates new task on enter
+                                    .onSubmit {
+                                        addNewTask()
+                                    }
+                                    .textFieldStyle(PlainTextFieldStyle())
+                                    .foregroundColor(themeManager.curTheme.main_color_1)
+                            }
                         }
+                        .padding(.horizontal, 40)
                     }
                 }
             }
@@ -134,9 +118,15 @@ struct TimerView: View {
         .frame(alignment: .center)
         .frame(width: 400, height: 500)
         .onAppear{
-            if storage.curChecklistId == nil, let firstChecklist = storage.checklists.first {
-                storage.curChecklistId = firstChecklist.id
+            if storage.checklists.isEmpty {
+                storage.addChecklist(name: "New checklist")
+                storage.saveChecklists()
             }
+            if storage.curChecklistId == nil {
+                storage.curChecklistId = storage.checklists.first!.id
+                storage.curChecklist = storage.checklists.first!
+            }
+            storage.saveChecklists()
             tokenLogic.updateDailyLimit()
             storage.updateTaskList()
         }.onTapGesture {

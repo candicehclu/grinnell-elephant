@@ -29,6 +29,6 @@ struct ElephantMacApp: App {
                 .environmentObject(token) // sets token accesible to all
         }
         .windowResizability(.contentSize)
-        .defaultSize(width: 500, height: 500)
+        .defaultSize(width: 400, height: 500)
     }
 }

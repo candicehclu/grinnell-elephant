@@ -22,9 +22,7 @@ class TaskListStorage: ObservableObject{
     @AppStorage("lastTasklistUpdate") var lastTasklistUpdate: Double = 0.0
     
     @Published var curChecklistId: UUID? = nil
-    var curChecklist: Checklist? {
-        checklists.first(where: { $0.id == curChecklistId })
-    }
+    var curChecklist: Checklist?
     @Published var taskList = TaskList(tasks: []){ //saves current task list
         didSet{
             saveTasks()//updates tasks
@@ -35,6 +33,12 @@ class TaskListStorage: ObservableObject{
         didSet {
             saveChecklists()
             //SharedDataManager.shared.saveChecklists(checklists)
+        }
+    }
+    
+    func validateCurrentChecklist() {
+        if !checklists.contains(where: { $0.id == curChecklistId }) {
+            curChecklistId = checklists.first?.id
         }
     }
     
@@ -68,6 +72,8 @@ class TaskListStorage: ObservableObject{
             addTask(to: curChecklistId!, title: "Get ice cream at Dari Barn")
             addTask(to: curChecklistId!, title: "Chill at the hammocks")
             addTask(to: curChecklistId!, title: "Play a game (pool/foosball/ping pong) at game room")
+            curChecklistId = firstChecklist.id
+            curChecklist = firstChecklist
             saveChecklists()
         }
     }

@@ -68,7 +68,9 @@ struct ContentView: View {
                     NavigationLink(destination: TimerView()) {
                         Picker("Mode", selection: $timerMode) {
                             Text("Stopwatch").tag("stopwatch")
+                                .foregroundColor(themeManager.curTheme.text_2)
                             Text("Pomodoro").tag("pomodoro")
+                                .foregroundColor(themeManager.curTheme.text_2)
                         }
                         .pickerStyle(.menu)
                         .frame(width: 125, alignment: .center) // keeps the "mode: currentmode" padded and centered
