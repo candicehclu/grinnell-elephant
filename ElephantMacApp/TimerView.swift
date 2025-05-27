@@ -27,17 +27,6 @@ struct TimerView: View {
     @AppStorage("lastLimitUpdate") var lastLimitUpdate: Double = Date.now.timeIntervalSince1970
     
     @FocusState private var focusedTaskID: UUID?
-    
-    private func addNewTask() {
-        let trimmed = newTask.trimmingCharacters(in: .whitespaces)
-        guard !trimmed.isEmpty else { return }
-        
-        // Make sure we have a valid checklist to add to
-        if let checklist = storage.curChecklist {
-            storage.addTask(to: checklist.id, title: trimmed)
-            newTask = "" // clear input after adding
-        }
-    }
 
     var body: some View {
         VStack{
@@ -54,61 +43,7 @@ struct TimerView: View {
             }
             
             ScrollView{
-                VStack(spacing: 15){
-                    if let checklist = storage.curChecklist {
-                        VStack(alignment: .leading, spacing: 10) {
-                            ForEach(checklist.tasks.indices, id: \.self) { index in
-                                let task = checklist.tasks[index]
-                                HStack {
-                                    Image(systemName: task.isCompleted
-                                          ? "checkmark.square.fill"
-                                          : "square")
-                                    .foregroundColor(themeManager.curTheme.main_color_2)
-                                    .onTapGesture {
-                                        // Make a mutable copy of tasks
-                                        var updatedTasks = checklist.tasks
-                                        // Flip the isCompleted boolean
-                                        updatedTasks[index].isCompleted.toggle()
-                                        // Persist the change back into storage
-                                        storage.updateTasks(for: checklist.id,
-                                                            tasks: updatedTasks)
-                                        // If now completed, give the user a token
-                                        if updatedTasks[index].isCompleted {
-                                            tokenLogic.addToken()
-                                        }
-                                        // subtract token if user unchecked
-                                        if !updatedTasks[index].isCompleted {
-                                            tokenLogic.subtractToken()
-                                        }
-                                    }
-                                    EditableTextView(
-                                        task: Binding(
-                                            get: { checklist.tasks[index] },
-                                            set: {
-                                                var updatedTasks = checklist.tasks
-                                                updatedTasks[index] = $0
-                                                storage.updateTasks(for: checklist.id, tasks: updatedTasks)
-                                            }
-                                        )
-                                    )
-                                }
-                            }
-                            //additional new task row
-                            HStack {
-                                Image(systemName: "plus")
-                                    .foregroundColor(themeManager.curTheme.main_color_1)
-                                TextField("Add new task...", text: $newTask)//, onCommit: addNewTask)// <- new task creation on '+'
-                                //creates new task on enter
-                                    .onSubmit {
-                                        addNewTask()
-                                    }
-                                    .textFieldStyle(PlainTextFieldStyle())
-                                    .foregroundColor(themeManager.curTheme.main_color_1)
-                            }
-                        }
-                        .padding(.horizontal, 40)
-                    }
-                }
+                TimerTasklistView(checklistId: storage.curChecklistId!)
             }
             .padding(.bottom, 20)
         }
@@ -118,14 +53,6 @@ struct TimerView: View {
         .frame(alignment: .center)
         .frame(width: 400, height: 500)
         .onAppear{
-            if storage.checklists.isEmpty {
-                storage.addChecklist(name: "New checklist")
-                storage.saveChecklists()
-            }
-            if storage.curChecklistId == nil {
-                storage.curChecklistId = storage.checklists.first!.id
-                storage.curChecklist = storage.checklists.first!
-            }
             storage.saveChecklists()
             tokenLogic.updateDailyLimit()
             storage.updateTaskList()
@@ -156,33 +83,91 @@ struct TimerView: View {
         .padding([.top, .trailing], 15)
     }
 }
+
+struct TimerTasklistView: View {
+    var checklistId: UUID
+    @EnvironmentObject private var themeManager: ThemeManager
+    @EnvironmentObject var storage: TaskListStorage
+    @EnvironmentObject var tokenLogic: TokenLogic
     
-//    private func checklistButton(for checklist: Checklist) -> some View {
-//            
-//        Button(action: {
-//            selectedChecklist = checklist
-//        }) {
-//            VStack {
-//                Text(checklist.name) //displays checklist name
-//                    .font(.system(.title3, design: .rounded).weight(.medium))
-//                    .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_1))
-//                
-//                Spacer()
-//                
-//                Text("\(checklist.tasks.filter { $0.isCompleted }.count)/\(checklist.tasks.count)") //displays number of completed tasks/total tasks
-//                    .font(.system(.subheadline, design: .rounded))
-//                    .foregroundColor(themeManager.textColor(for: themeManager.curTheme.main_color_1).opacity(0.7))
-//            }
-//            .padding()
-//            .background(
-//                RoundedRectangle(cornerRadius: 10)
-//                    .fill(themeManager.curTheme.main_color_1))
-//            .fixedSize()
-//        }
-//        .buttonStyle(PlainButtonStyle())
-//    }
-//    
-//}
+    // checklist variables
+    @State private var newTask: String = ""
+    
+    // adds new task to the specified tasklist
+    func addNewTask(checklistId: UUID) {
+        let trimmed = newTask.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return }
+        
+        // Make sure we have a valid checklist to add to
+        if storage.checklists.first(where: { $0.id == checklistId }) != nil {
+            storage.addTask(to: checklistId, title: trimmed)
+            newTask = "" // clear input after adding
+        }
+    }
+    
+    var body: some View {
+        VStack(spacing: 15){
+            // work task list
+            if let checklist = storage.checklists.first(where: { $0.id == checklistId }) {
+                VStack(alignment: .leading, spacing: 10) {
+                    let indices = Array(0..<checklist.tasks.count)
+                    ForEach(indices, id: \.self) { index in
+                        let task = checklist.tasks[index]
+                        HStack {
+                            Image(systemName: task.isCompleted
+                                  ? "checkmark.square.fill"
+                                  : "square")
+                            .foregroundColor(themeManager.curTheme.main_color_2)
+                            .onTapGesture {
+                                // Make a mutable copy of tasks
+                                var updatedTasks = checklist.tasks
+                                // Flip the isCompleted boolean
+                                updatedTasks[index].isCompleted.toggle()
+                                // Persist the change back into storage
+                                storage.updateTasks(for: checklist.id,
+                                                    tasks: updatedTasks)
+                                // edit token if it's a wellness task
+                                if task.isWellness {
+                                    // If now completed, give the user a token
+                                    if updatedTasks[index].isCompleted {
+                                        tokenLogic.addToken()
+                                    }
+                                    // subtract token if user unchecked
+                                    if !updatedTasks[index].isCompleted {
+                                        tokenLogic.subtractToken()
+                                    }
+                                }
+                            }
+                            EditableTextView(
+                                task: Binding(
+                                    get: { checklist.tasks[index] },
+                                    set: {
+                                        var updatedTasks = checklist.tasks
+                                        updatedTasks[index] = $0
+                                        storage.updateTasks(for: checklist.id, tasks: updatedTasks)
+                                    }
+                                )
+                            )
+                        }
+                    }
+                    //additional new task row
+                    HStack {
+                        Image(systemName: "plus")
+                            .foregroundColor(themeManager.curTheme.main_color_1)
+                        TextField("Add new task...", text: $newTask)//, onCommit: addNewTask)// <- new task creation on '+'
+                        //creates new task on enter
+                            .onSubmit {
+                                addNewTask(checklistId: checklist.id)
+                            }
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .foregroundColor(themeManager.curTheme.main_color_1)
+                    }
+                }
+                .padding(.horizontal, 40)
+            }
+        }
+    }
+}
 
 #Preview {
 let themeManager = ThemeManager()
