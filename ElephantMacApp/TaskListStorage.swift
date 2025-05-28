@@ -27,11 +27,11 @@ var GrinnellStudyBreaks = [
     "Drink a cup of water",
     "Go for a quick walk around campus",
     "Stretch for three minutes",
-    "Get a drink and snacks at DSA suite (JRC 3rd)",
+    "Get snacks at DSA suite (JRC 3rd)",
     "Get coffee at Saints rest",
     "Get ice cream at Dari Barn",
     "Chill at the hammocks",
-    "Play a game (pool/foosball/ping pong) at game room",
+    "Play a game at game room",
     "Admire the beauty of sunset"
 ]
 
@@ -85,12 +85,12 @@ class TaskListStorage: ObservableObject{
         loadTasks() // loads tasks for user view
         loadChecklists() //loads all currently existing checklists
         
-        // use this to reset checklist storage!
-//        if !checklists.isEmpty {
-//            checklists = []
+//        // use this to reset checklist storage!
+        if !checklists.isEmpty {
+            checklists = []
             
-        // first time: initialize checklists
-        if checklists.isEmpty {
+//        // first time: initialize checklists
+//        if checklists.isEmpty {
             // list of all wellness items
             let wellnessTaskStorage = Checklist(name: "Grinnell study breaks!", tasks: [], canDelete: false)
             checklists.append(wellnessTaskStorage)
@@ -238,14 +238,6 @@ class TaskListStorage: ObservableObject{
             saveChecklists()
         }
     }
-    
-//    //original addTask for default checklist
-//    func addTask(title: String) {
-//            let newTask = TaskItem(title: title)
-//            taskList.tasks.append(newTask)
-//            saveTasks()
-//        }
-
 
   //marks task as completed once the user selects
     func markTastCompleted(task: TaskItem){
@@ -268,5 +260,11 @@ class TaskListStorage: ObservableObject{
             saveTasks()
             saveChecklists()
         }
+    }
+    
+    // retrieves a new wellness task from storage and adds to wellness checklist
+    func getNewWellnessTask() -> String {
+        let toAdd = checklists.first(where: { $0.id == wellnessTaskStorageId })!.tasks.randomElement()
+        return toAdd!.title
     }
 }
