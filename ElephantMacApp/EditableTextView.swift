@@ -15,8 +15,16 @@ struct EditableTextView: View {
     @State private var isEditing = false
     @Binding var task: TaskItem
     @FocusState private var isFocused: Bool
+    
+    let textColor: Color
+
+    init(task: Binding<TaskItem>, textColor: Color? = nil) {
+        self._task = task
+        self.textColor = textColor ?? .black
+    }
 
     var body: some View {
+        
         if isEditing {
             TextField(task.title, text: $task.title, onCommit: {
                 isEditing = false
@@ -32,7 +40,7 @@ struct EditableTextView: View {
                     isEditing = true
                 }
                 .strikethrough(task.isCompleted)
-                .foregroundColor(themeManager.curTheme.main_color_2)
+                .foregroundColor(textColor)
         }
     }
 }

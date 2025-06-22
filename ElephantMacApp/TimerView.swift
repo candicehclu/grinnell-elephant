@@ -82,7 +82,7 @@ struct TimerView: View {
             Spacer()
             ToHomePageButton() // Button to homepage
             ToSettingsPageButton() // Button to settings page
-            ToManualPageButton() // Button to manual page
+//            ToManualPageButton() // Button to manual page
         }
         .padding([.top, .trailing], 15)
     }
@@ -101,7 +101,7 @@ struct WellnessTasklistView: View {
     // Delete item and wait for 2 secs before saving the change to storage
     func addNewWellnessTask(updatedTasks: [TaskItem], index: Int) {
         var updated = updatedTasks
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
             let newTask = storage.getNewWellnessTask()
             updated.remove(at: index)
             updated.append(TaskItem(title: newTask, isCompleted: false))
@@ -112,51 +112,46 @@ struct WellnessTasklistView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 15){
-            // work task list
-//            if let checklist = storage.checklists.first(where: { $0.id == checklistId }) {
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(Array(checklist.tasks.enumerated()), id: \.element.id) { index, task in
-//                    let indices = checklist.tasks.enumerated().map { $0.offset }
-//                    ForEach(indices, id: \.self) { index in
-//                        let task = checklist.tasks[index]
-                        HStack {
-                            Image(systemName: task.isCompleted
-                                  ? "heart.fill"
-                                  : "heart")
-                            .foregroundColor(task.isCompleted ? Color.red : themeManager.curTheme.main_color_2)
-                            .onTapGesture {
-                                
-                                // Make a mutable copy of tasks and mark as complete
-                                var updatedTasks = checklist.tasks
-                                updatedTasks[index].isCompleted.toggle()
+            // wellness task list
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(Array(checklist.tasks.enumerated()), id: \.element.id) { index, task in
+                    HStack {
+                        Image(systemName: task.isCompleted
+                              ? "heart.fill"
+                              : "heart")
+                        .foregroundColor(task.isCompleted ? Color.red : themeManager.curTheme.text_1)
+                        .onTapGesture {
+                            
+                            // Make a mutable copy of tasks and mark as complete
+                            var updatedTasks = checklist.tasks
+                            updatedTasks[index].isCompleted.toggle()
 
-                                // If now completed, give the user a token
-                                if updatedTasks[index].isCompleted {
-                                    tokenLogic.addToken()
-                                } else {
-                                    tokenLogic.subtractToken()
-                                }
-                                
-                                // update tasks so red heart shows
-                                storage.updateTasks(for: checklist.id,
-                                                        tasks: updatedTasks)
-                                addNewWellnessTask(updatedTasks: updatedTasks, index: index)
+                            // If now completed, give the user a token
+                            if updatedTasks[index].isCompleted {
+                                tokenLogic.addToken()
+                            } else {
+                                tokenLogic.subtractToken()
                             }
-                            EditableTextView(
-                                task: Binding(
-                                    get: { checklist.tasks[index] },
-                                    set: {
-                                        var updatedTasks = checklist.tasks
-                                        updatedTasks[index] = $0
-                                        storage.updateTasks(for: checklist.id, tasks: updatedTasks)
-                                    }
-                                )
-                            )
+                            
+                            // update tasks so red heart shows
+                            storage.updateTasks(for: checklist.id,
+                                                    tasks: updatedTasks)
+                            addNewWellnessTask(updatedTasks: updatedTasks, index: index)
                         }
+                        EditableTextView(
+                            task: Binding(
+                                get: { checklist.tasks[index] },
+                                set: {
+                                    var updatedTasks = checklist.tasks
+                                    updatedTasks[index] = $0
+                                    storage.updateTasks(for: checklist.id, tasks: updatedTasks)
+                                }
+                            )
+                        )
                     }
                 }
-                .padding(.horizontal, 40)
-//            }
+            }
+            .padding(.horizontal, 40)
         }
     }
 }
@@ -212,7 +207,8 @@ struct TimerTasklistView: View {
                                         updatedTasks[index] = $0
                                         storage.updateTasks(for: checklist.id, tasks: updatedTasks)
                                     }
-                                )
+                                ),
+                                textColor: themeManager.curTheme.main_color_2
                             )
                         }
                     }

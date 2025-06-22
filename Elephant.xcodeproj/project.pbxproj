@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		39E558522E077F3000F8E99E /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 39E558512E077F3000F8E99E /* FirebaseAnalytics */; };
+		39E558572E07848500F8E99E /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 39E558562E07848500F8E99E /* FirebaseMessaging */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		398DCF2D2DAC7AC0003363BD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -79,6 +84,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				39E558572E07848500F8E99E /* FirebaseMessaging in Frameworks */,
+				39E558522E077F3000F8E99E /* FirebaseAnalytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,6 +160,8 @@
 			);
 			name = ElephantMacApp;
 			packageProductDependencies = (
+				39E558512E077F3000F8E99E /* FirebaseAnalytics */,
+				39E558562E07848500F8E99E /* FirebaseMessaging */,
 			);
 			productName = ElephantMacApp;
 			productReference = 398DCF1C2DAC7ABD003363BD /* ElephantMacApp.app */;
@@ -236,6 +245,9 @@
 			);
 			mainGroup = 39957E032D62A32D00A2D89D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				39E558502E077F3000F8E99E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 39957E0D2D62A32D00A2D89D /* Products */;
 			projectDirPath = "";
@@ -610,6 +622,29 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		39E558502E077F3000F8E99E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.14.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		39E558512E077F3000F8E99E /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 39E558502E077F3000F8E99E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		39E558562E07848500F8E99E /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseMessaging;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 39957E042D62A32D00A2D89D /* Project object */;
 }

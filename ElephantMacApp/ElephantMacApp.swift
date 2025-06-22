@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 @main
 struct ElephantMacApp: App {
@@ -13,9 +14,11 @@ struct ElephantMacApp: App {
     @StateObject var themeManager = ThemeManager()
     @StateObject var token = TokenLogic()
     
-    // ask permission of notificaiont
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
+    // ask permission of notification
     init() {
-        
+        FirebaseApp.configure()
         NotificationView.shared.requestNotificationPermission()
         print(UserDefaults.standard.integer(forKey: "tokenNum"))
         //https://www.hackingwithswift.com/read/12/2/reading-and-writing-basics-userdefaults
