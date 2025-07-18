@@ -132,9 +132,9 @@ struct SettingsView: View {
     // Displays Pomodoro time settings and sliders
     private var pomodoroTimeSection: some View {
         timeSection(title: "Pomodoro", sliders: [
-            // ("Work Duration", $selectedWorkTime, 20, 60, 5),
-            ("Work Duration", $selectedWorkTime, 0.1, 60, 0.1),
-            ("Short Break Duration", $shortBreakTime, 5, 30, 5),
+             ("Work Duration", $selectedWorkTime, 20, 60, 5),
+//            ("Work Duration", $selectedWorkTime, 0.1, 60, 0.1),
+            ("Short Break Duration", $shortBreakTime, 5, 15, 5),
             ("Long Break Duration", $longBreakTime, 15, 30, 5)
         ])
     }

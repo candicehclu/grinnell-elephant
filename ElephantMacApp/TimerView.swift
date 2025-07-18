@@ -146,7 +146,8 @@ struct WellnessTasklistView: View {
                                     updatedTasks[index] = $0
                                     storage.updateTasks(for: checklist.id, tasks: updatedTasks)
                                 }
-                            )
+                            ),
+                            textColor: themeManager.curTheme.text_1
                         )
                     }
                 }
