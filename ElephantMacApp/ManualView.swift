@@ -86,33 +86,22 @@ struct ManualTemplateView<Content: View>:  View {
         // Main Layout Start
         //--------------------
         VStack(spacing: 0) {
-            HStack {// Header stack with home button
-                Spacer()//expands leftward
-                ToHomePageButton()
-                ToSettingsPageButton()
-            }//HStack
-            
-            .padding()
-            
             //-------------------
             // Content Area Start
             //-------------------
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {// Content stack inside scroll
-                    content
-                    Spacer(minLength: 80) // space above the nav buttons
-                }//VStack
-                .padding()
-                .background(
-                    Color.clear
-                        .accessibilityElement(children: .combine)
-                        .accessibilityIdentifier(currentPageIdentifier)
-                        .shadow(color: themeManager.curTheme.text_1.opacity(0.2), radius: 8, x: 0, y: 4)
-                )
-                .id(currentPageIdentifier)
+                content
+                    .padding()
+                    .background(
+                        Color.clear
+                            .accessibilityElement(children: .combine)
+                            .accessibilityIdentifier(currentPageIdentifier)
+                            .shadow(color: themeManager.curTheme.text_1.opacity(0.2), radius: 8, x: 0, y: 4)
+                    )
+                    .id(currentPageIdentifier)
             }//ScrollView
-            
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
             //--------------------
             // Button Stack Starts
             //--------------------
@@ -149,7 +138,6 @@ struct ManualTemplateView<Content: View>:  View {
         .frame(width: 400, height: 500)
         .background(themeManager.curTheme.background_1)
     }//VStack
-    
 }// var body
 
 
@@ -171,13 +159,19 @@ struct ManualView:View{
             content: {
                 
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Welcome to Elephant!")
-                        .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                    HStack {// Header stack with home button
+                        Text("Welcome!")
+                            .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                        Spacer()//expands leftward
+                        ToHomePageButton()
+                        ToSettingsPageButton()
+                    }//HStack
                     Text(
-                        "Are you ready to incorporate wellness tasks into your work routine with us? Let’s get started!"
+                        "Are you ready to incorporate wellness tasks into your work routine with us? Balance your work and wellness routine through Elephant. Let’s get started!"
                     )
-                    Text("Balance you work and wellness routine through Elephant")
-                    Text("For the notification, go to System Settings>Notifications and allow notification for Elephant.")
+                    Text("To turn on notifications, go to ")
+                    + Text("System Settings > Notifications ").bold()
+                    + Text("and allow notification from Elephant: A Wellness Trunk.")
                     NavigationLink(destination: StopwatchPageView()) {
                         
                         Text("Stopwatch Mode")
@@ -222,16 +216,16 @@ struct ManualView:View{
                     }//NavigationLink examplespage
                     .buttonStyle(PlainButtonStyle())
                     
-                    NavigationLink(destination: WidgetSetupPageView()) {
-                        Text("Set Up Widget")
-                            .font(.system(.title2, design: .rounded).weight(.semibold))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding()
-                            .background(themeManager.curTheme.main_color_1)
-                            .cornerRadius(10)
-                        
-                    }//NavigationLink widgetsetup
-                    .buttonStyle(PlainButtonStyle())
+                    //                    NavigationLink(destination: WidgetSetupPageView()) {
+                    //                        Text("Set Up Widget")
+                    //                            .font(.system(.title2, design: .rounded).weight(.semibold))
+                    //                            .frame(maxWidth: .infinity, alignment: .leading)
+                    //                            .padding()
+                    //                            .background(themeManager.curTheme.main_color_1)
+                    //                            .cornerRadius(10)
+                    //
+                    //                    }//NavigationLink widgetsetup
+                    //                    .buttonStyle(PlainButtonStyle())
                 }//vstack
             }//content
             ,
@@ -255,15 +249,19 @@ struct StopwatchPageView: View {
             currentPageIdentifier: "stopwatchPage",
             content: {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Stopwatch Mode")
-                        .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                    HStack {// Header stack with home button
+                        Text("Stopwatch Mode")
+                            .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                        Spacer()//expands leftward
+                        ToHomePageButton()
+                        ToSettingsPageButton()
+                    }//HStack
                     
                     Text("Turn on the stopwatch when you start working. Receive wellness reminders at custom intervals, and turn it off when you're done.")
                         .font(.body)
                     
                     //probably insert something for settings on how to use
                 }// vstack
-                .padding()
             },
             backPage: AnyView(ManualView()), // back to home
             homePage: AnyView(ContentView())
@@ -285,8 +283,13 @@ struct PomodoroPageView: View {
             currentPageIdentifier: "pomodoroPage",
             content: {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Pomodoro Mode")
-                        .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                    HStack {// Header stack with home button
+                        Text("Pomodoro Mode")
+                            .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                        Spacer()//expands leftward
+                        ToHomePageButton()
+                        ToSettingsPageButton()
+                    }//HStack
                     
                     Text("Work in focused intervals with short breaks in between. After four work sessions, enjoy a longer break to recharge!")
                         .font(.body)
@@ -314,8 +317,13 @@ struct TokensPageView: View {
             currentPageIdentifier: "tokensPage",
             content: {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Earn Tokens")
-                        .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                    HStack {// Header stack with home button
+                        Text("Earn Tokens")
+                            .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                        Spacer()//expands leftward
+                        ToHomePageButton()
+                        ToSettingsPageButton()
+                    }//HStack
                     
                     Text("How To")
                         .font(.system(.title2, design: .rounded).weight(.bold))
@@ -442,8 +450,13 @@ struct ExamplesPageView: View {
             content: {
                 
                 VStack(alignment: .leading, spacing: 24) {
-                    Text("Customize Elephant to Your Needs!")
-                        .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                    HStack {// Header stack with home button
+                        Text("Fit Your Needs")
+                            .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                        Spacer()//expands leftward
+                        ToHomePageButton()
+                        ToSettingsPageButton()
+                    }//HStack
                     
                     //example sam's story
                     VStack(alignment: .leading, spacing: 8) {
@@ -512,10 +525,17 @@ struct WidgetSetupPageView: View {
             currentPageIdentifier: "widgetSetupPage",
             content: {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Add Elephant to Widget Bar")
-                        .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                    HStack {// Header stack with home button
+                        Text("Add to Widget Bar")
+                            .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                        Spacer()//expands leftward
+                        ToHomePageButton()
+                        ToSettingsPageButton()
+                    }//HStack
+                    
                     
                     Text("""
+                    (1) Open Notification Center by clicking the date/time in the menu bar of the mac book (Desktop) or swiping left from the right side of the trackpad.
                     (1) Open Notification Center by clicking the date/time in the menu bar of the mac book (Desktop) or swiping left from the right side of the trackpad.
                     (2) Scroll to 'Edit Widgets'.
                     (3) Search for 'ElephantMacApp'.

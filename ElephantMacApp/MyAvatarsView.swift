@@ -27,7 +27,7 @@ struct MyAvatarView: View {
                         TokenDisplay()
                         ToHomePageButton() // Button to homepage
                         ToSettingsPageButton() // Button to settings page
-                        ToManualPageButton() // Button to manual page
+//                        ToManualPageButton() // Button to manual page
                     }
                     DisplayAllItems(action: { avatar in
                         selectedAvatar = avatar

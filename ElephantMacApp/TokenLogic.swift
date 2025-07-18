@@ -114,6 +114,11 @@ class TokenLogic: ObservableObject{ // observable object for : class that update
     }//addToken
     
     func updateDailyLimit() {
+//        let calendar = Calendar.current
+//        let timeZone = TimeZone.current
+//        
+//        let components = calendar.dateComponents(in: timeZone, from: Date())
+//        let today = components.date
         let today = Date.now
         let lastUpdateDate = NSDate(timeIntervalSince1970: lastLimitUpdate)
         // if not same day, update daily limit

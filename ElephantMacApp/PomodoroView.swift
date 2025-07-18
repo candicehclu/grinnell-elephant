@@ -145,7 +145,6 @@ struct PomodoroView: View{
                                     updateTimer()
                                 }
                             }
-//                .foregroundColor(themeManager.Mode ? themeManager.textColor(for: themeManager.curTheme.background) : themeManager.textColor(for: themeManager.curTheme.main_color_1))
                 .foregroundColor(themeManager.curTheme.text_1)
                 .padding(.top, -8)
                 .padding(.bottom, -1)

@@ -34,7 +34,7 @@ struct ItemView: View {
                                 .foregroundStyle(themeManager.curTheme.main_color_2)
                                 .frame(width: 50, height: 30)
                                 .overlay(
-                                    Text("Back").foregroundColor(themeManager.curTheme.background_1))
+                                    Text("Back").foregroundColor(themeManager.curTheme.text_2))
                         }
                         .buttonStyle(PlainButtonStyle())
                         .padding(10)

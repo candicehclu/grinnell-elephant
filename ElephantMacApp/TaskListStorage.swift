@@ -4,6 +4,14 @@
 //
 //  Created by Pruneda Turcios, Gabriela (Gabby) on 4/6/25.
 //
+// TODO:
+// 1. have a storage of wellness tasks that cannot be deleted entirely, but can be edited
+// 2. have one single task list that cannot be deleted but can be edited
+// 3. data structure:
+//      a. default work task list
+//      b. default wellness task list
+//      c. a list to store all wellness tasks (can be edited)
+
 import SwiftUI
 import Foundation
 
@@ -12,19 +20,34 @@ struct Checklist: Identifiable, Codable {
     var id = UUID()
     var name: String
     var tasks: [TaskItem]
+    var canDelete: Bool = true
 }
+
+var GrinnellStudyBreaks = [
+    "Drink a cup of water",
+    "Go for a quick walk around campus",
+    "Stretch for three minutes",
+    "Get snacks at DSA suite (JRC 3rd)",
+    "Get coffee at Saints rest",
+    "Get ice cream at Dari Barn",
+    "Chill at the hammocks",
+    "Play a game at game room",
+    "Admire the beauty of sunset"
+]
 
 //TaskListStorage stores tasks objects to file TaskLists.json
 class TaskListStorage: ObservableObject{
     private let tasksFilename = "TaskLists.json"
     private let checklistsFilename = "Checklists.json"
     
+    // tracks last update time
     @AppStorage("lastTasklistUpdate") var lastTasklistUpdate: Double = 0.0
     
-    @Published var curChecklistId: UUID? = nil
-    var curChecklist: Checklist? {
-        checklists.first(where: { $0.id == curChecklistId })
-    }
+    // current checklist showed on timer page
+    @Published var curChecklistId: UUID? = nil // default work task list (shown on timerview)
+    @Published var curWellnessListId: UUID? = nil // default wellness task list (shown on timerview), randomly takes tasks from wellnessTaskStorage
+    @Published var wellnessTaskStorageId: UUID? = nil // list of wellness tasks, can be edited but doesn't show on timerview
+    
     @Published var taskList = TaskList(tasks: []){ //saves current task list
         didSet{
             saveTasks()//updates tasks
@@ -34,16 +57,20 @@ class TaskListStorage: ObservableObject{
     @Published var checklists: [Checklist] = [] {
         didSet {
             saveChecklists()
-            //SharedDataManager.shared.saveChecklists(checklists)
         }
     }
     
+    // update the last time the tasklist was updated
     func updateTaskList() {
-        let today = Date.now
+        let calendar = Calendar.current
+        let timeZone = TimeZone.current
+        
+        let components = calendar.dateComponents(in: timeZone, from: Date())
+        let today = components.date
         let lastUpdateDate = NSDate(timeIntervalSince1970: lastTasklistUpdate)
         // if not same day, delete all tasks that are completed
-        if !Calendar.current.isDate(today, inSameDayAs: lastUpdateDate as Date) {
-            lastTasklistUpdate = today.timeIntervalSince1970
+        if !Calendar.current.isDate(today ?? Date.now, inSameDayAs: lastUpdateDate as Date) {
+            lastTasklistUpdate = today!.timeIntervalSince1970
             for checklist in checklists {
                 for task in checklist.tasks {
                     if task.isCompleted {
@@ -55,19 +82,44 @@ class TaskListStorage: ObservableObject{
     }
     
     init(){
-        loadTasks() //loads tasks for user view
+        loadTasks() // loads tasks for user view
         loadChecklists() //loads all currently existing checklists
         
-        // created default grinnell wellness checklist if none currently exists
-        if checklists.isEmpty {
-            let firstChecklist = Checklist(name: "Fun activities at Grinnell!", tasks: [])
-            checklists.append(firstChecklist)
-            curChecklistId = firstChecklist.id
-            addTask(to: curChecklistId!, title: "Get a drink and snacks at DSA suite (JRC 3rd)")
-            addTask(to: curChecklistId!, title: "Get coffee at Saints rest")
-            addTask(to: curChecklistId!, title: "Get ice cream at Dari Barn")
-            addTask(to: curChecklistId!, title: "Chill at the hammocks")
-            addTask(to: curChecklistId!, title: "Play a game (pool/foosball/ping pong) at game room")
+//        // use this to reset checklist storage!
+        if !checklists.isEmpty {
+            checklists = []
+            
+//        // first time: initialize checklists
+//        if checklists.isEmpty {
+            // list of all wellness items
+            let wellnessTaskStorage = Checklist(name: "Grinnell study breaks!", tasks: [], canDelete: false)
+            checklists.append(wellnessTaskStorage)
+            for task in GrinnellStudyBreaks {
+                addTask(to: wellnessTaskStorage.id, title: task, isWellness: true)
+            }
+            wellnessTaskStorageId = wellnessTaskStorage.id
+            saveChecklists()
+            
+            // list of wellness tasks (shown on timer page) with three random things to begin with
+            let wellnessChecklist = Checklist(name: "Wellness tasks", tasks: [], canDelete: false)
+            checklists.append(wellnessChecklist)
+            // shuffle tasks and get first three
+            let shuffled = checklists.first(where: { $0.id == wellnessTaskStorageId })!.tasks.shuffled()
+            let randomPicks = shuffled.prefix(3)
+            print("adding tasks to wellness list")
+            for task in randomPicks {
+                print(task.title)
+                print("supposed to print")
+                addTask(to: wellnessChecklist.id, title: task.title, isWellness: true)
+            }
+            curWellnessListId = wellnessChecklist.id
+            
+            // list of work tasks (shown on timer page)
+            let workChecklist = Checklist(name: "Work tasks", tasks: [], canDelete: false)
+            checklists.append(workChecklist)
+            curChecklistId = workChecklist.id
+            addTask(to: curChecklistId!, title: "Get signature for MAP application")
+            addTask(to: curChecklistId!, title: "Fix bug in Elephant App")
             saveChecklists()
         }
     }
@@ -168,29 +220,24 @@ class TaskListStorage: ObservableObject{
         }
     }
        
-    // Remove a checklist
+    // Remove a checklist, only if it's deletable
     func removeChecklist(id: UUID) {
-        checklists.removeAll { $0.id == id }
-        saveChecklists()
+        let checklist = checklists.first(where: { $0.id == id})
+        if checklist!.canDelete {
+            checklists.removeAll { $0.id == id }
+            saveChecklists()
+        }
     }
 
 
   //updates a new task to the specified checklist
-    func addTask(to checklistId: UUID, title: String){
+    func addTask(to checklistId: UUID, title: String, isWellness: Bool = false){
         if let index = checklists.firstIndex(where: {$0.id == checklistId}){
             let newTask = TaskItem(title: title)
             checklists[index].tasks.append(newTask)
             saveChecklists()
         }
     }
-    
-    //original addTask for default checklist
-    func addTask(title: String) {
-            let newTask = TaskItem(title: title)
-            taskList.tasks.append(newTask)
-            saveTasks()
-        }
-
 
   //marks task as completed once the user selects
     func markTastCompleted(task: TaskItem){
@@ -213,5 +260,11 @@ class TaskListStorage: ObservableObject{
             saveTasks()
             saveChecklists()
         }
+    }
+    
+    // retrieves a new wellness task from storage and adds to wellness checklist
+    func getNewWellnessTask() -> String {
+        let toAdd = checklists.first(where: { $0.id == wellnessTaskStorageId })!.tasks.randomElement()
+        return toAdd!.title
     }
 }
